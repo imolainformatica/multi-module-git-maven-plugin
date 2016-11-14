@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>it.mfm.test</groupId>
+    <artifactId>multi-module-git-maven-plugin</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>multi-module-git-maven-plugin Maven Mojo</name>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+    <build>
+            <plugins>
+                <plugin>
+                    <groupId>it.mfm</groupId>
+                    <artifactId>multi-module-git-maven-plugin</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                    <configuration>
+                        <basedir>target/test-classese/unit/multi-module-git-mojo</basedir>
+                        <repodir>target/test-classese/unit/multi-module-git-mojo/repositories</repodir>
+                        <widgets>
+                            <widget>
+                                <name>Widget1</name>
+                                <repository>http://repo1.git</repository>
+                                <version>1.0</version>
+                                <localDir>Widget1</localDir>
+                            </widget>
+                            <widget>
+                                <name>Widget2</name>
+                                <repository>http://repo2.git</repository>
+                                <version>2.0</version>
+                                <localDir>Widget2</localDir>
+                            </widget>
+                        </widgets>
+                    </configuration>
+                </plugin>
+            </plugins>
+    </build>
+
+</project>

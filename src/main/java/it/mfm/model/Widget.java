@@ -1,5 +1,9 @@
 package it.mfm.model;
 
+/**
+ * Classe di modello che rappresenta un widget, ovvero un componente della app
+ *
+ */
 public class Widget {
 	
     /**
@@ -18,10 +22,13 @@ public class Widget {
 	private String version;
 	
 	/**
-	 * Il nome della directory locale che viene generato
+	 * Il nome della directory locale che viene generata dopo il checkout
 	 */
 	private String localDir;
 	
+	/**************************************
+     * getter & setter
+     **************************************/
 	public String getName() {
 		return name;
 	}

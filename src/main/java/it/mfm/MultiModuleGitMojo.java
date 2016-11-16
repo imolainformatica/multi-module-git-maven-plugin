@@ -1,36 +1,51 @@
 package it.mfm;
 
+import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.util.StringUtils;
 
 import it.mfm.biz.GitHandler;
-import it.mfm.biz.ResourceHandler;
+import it.mfm.biz.BuildHelper;
 import it.mfm.model.Widget;
-import it.mfm.util.MultiModuleGitUtil;
+import it.mfm.util.FileSystemUtil;
 
 @Mojo(name = "multi-module-git", defaultPhase = LifecyclePhase.PACKAGE, requiresOnline = true, threadSafe = false)
 public class MultiModuleGitMojo extends AbstractMojo {
-
-    /*
-     * STRUTTURA:
-     * 
-     * 1) APP PRINCIPALE 2) W1 . . . WN
-     * 
-     * - SCARICARE I SORGENTI DEI WIDGET DA GIT 
-     * - COPIARE LE RISORSE NEL PATH CORRETTO DELLA APP 
-     * - COMPILARE IL TUTTO CON GULP
-     * 
-     * NOTE: I WIDGET DEVONO AVERE UNA CERTA STRUTTURA. ALTRIMENTI BISOGNA
-     * PREVEDERE DIVERSI PARAMETRI (UNO PER RISORSA E.G. CSS, JS, ...)
-     * 
+    
+    /**
+     * Questi 3 component servono per il mojo executor plugin
      */
+    @Component
+    private MavenProject mavenProject;
+
+    @Component
+    private MavenSession mavenSession;
+
+    @Component
+    private BuildPluginManager pluginManager;
 
     /**
      * La root dell'applicazione invocante. Serve per calcolare i path relativi
@@ -51,9 +66,15 @@ public class MultiModuleGitMojo extends AbstractMojo {
     @Parameter(property = "multi-module-git.widgets")
     private List<Widget> widgets;
 
+    /**
+     * Gestori delle logiche del plugin
+     */
     GitHandler gitHandler = new GitHandler();
-    ResourceHandler resourceHandler = new ResourceHandler();
+    BuildHelper buildHelper = new BuildHelper();
 
+    /**************************************
+     * getter & setter
+     **************************************/
     public String getBasedir() {
         return basedir;
     }
@@ -78,13 +99,16 @@ public class MultiModuleGitMojo extends AbstractMojo {
         this.widgets = widgets;
     }
 
+    /**
+     * Esecuzione del plugin
+     */
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         /*
          * CONTROLLI PARAMETRI
          */
         try {
-            MultiModuleGitUtil.checkInputParams(this);
+            checkInputParams();
         } catch (Exception e) {
             // Errore parametri di configurazione
             getLog().error("Errore nella verifica dei parametri di input.\n" + e.getMessage() + "\n", e);
@@ -107,17 +131,34 @@ public class MultiModuleGitMojo extends AbstractMojo {
             } catch (Exception e) {
                 getLog().error("Errore durante la gestione del repository.", e);
             }
-
-            // TODO Gestione risorse
-            resourceHandler.handleResources(widget, repodir);
             
-            // STEP 5 - Copio le risorse nel path corretto della app --> TODO
-            // !!!Clash di nomi ? !!!
+            // Copia dei file
+            buildHelper.copyResources(mavenProject, mavenSession, pluginManager, widget, repodir, basedir);
         }
 
         // PARTE APP
-        // STEP 1 - Build della app
-
+        // Build della app
+        buildHelper.buildApp(mavenProject, mavenSession, pluginManager);
+        
+    }
+    
+    
+    /**
+     * Metodo di utilità per il controllo dei parametri di input del plugin.
+     * Restituisce un eccezione in caso il parametro {@code basedir} non sia presente o non punti ad una directory
+     * @throws Exception
+     */
+    private void checkInputParams() throws Exception {
+                
+        String basedir = this.getBasedir();
+        if(StringUtils.isEmptyOrNull(basedir)){
+            throw new Exception("Errore di inizializzazione: il campo basedir è obbligatorio");
+        }
+        
+        File file = new File(basedir);
+        if(FileSystemUtil.isFileADirectory(file)){
+            throw new Exception("Errore di inizializzazione: il campo basedir non punta ad una directory corretta");
+        }
     }
 
 }

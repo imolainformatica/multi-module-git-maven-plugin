@@ -10,6 +10,9 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
+/**
+ * Classe di utilità per l'interazione con i repository git attraverso JGit.
+ */
 public class JGitUtil {
 
     /**
@@ -66,13 +69,25 @@ public class JGitUtil {
         closeGit(git);
     }
 
-    public static void closeGit(Git git) {
+    /**
+     * Chiude la connessione per evitare memory leakage
+     * 
+     * @param git
+     *            - l'interfaccia {@link Git} attualmente utilizzata
+     */
+    private static void closeGit(Git git) {
         if (git != null) {
             git.close();
         }
     }
 
-    // Non utilizzato al momento
+    /**
+     * Permette di effettuare il pull di un repository.
+     * 
+     * @param localPathRepo
+     *            - path del repository locale
+     * @throws Exception
+     */
     public static void pullRepository(String localPathRepo) throws Exception {
 
         if (!FileSystemUtil.isFileADirectory(localPathRepo)) {
@@ -85,6 +100,13 @@ public class JGitUtil {
         closeGit(git);
     }
 
+    /**
+     * Controlla se il repository indicato in ingresso esista o meno all'interno del filesystem
+     * 
+     * @param repository
+     *            - l'indirizzo di un repository da controllare
+     * @return - un {@code boolean} che vale false se il repository non esista, true altrimenti 
+     */
     public static boolean checkRepositoryExists(String repository) {
 
         if (!FileSystemUtil.isFileADirectory(repository)) {

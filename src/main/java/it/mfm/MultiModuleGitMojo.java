@@ -1,18 +1,6 @@
 package it.mfm;
 
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.element;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.name;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
@@ -27,8 +15,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.util.StringUtils;
 
-import it.mfm.biz.GitHandler;
 import it.mfm.biz.BuildHelper;
+import it.mfm.biz.GitHelper;
 import it.mfm.model.Widget;
 import it.mfm.util.FileSystemUtil;
 
@@ -69,7 +57,7 @@ public class MultiModuleGitMojo extends AbstractMojo {
     /**
      * Gestori delle logiche del plugin
      */
-    GitHandler gitHandler = new GitHandler();
+    GitHelper gitHelper = new GitHelper();
     BuildHelper buildHelper = new BuildHelper();
 
     /**************************************
@@ -127,7 +115,7 @@ public class MultiModuleGitMojo extends AbstractMojo {
             
             // Gestione repository git
             try {
-                gitHandler.handleRepository(widget, repodir);
+                gitHelper.handleRepository(widget, repodir);
             } catch (Exception e) {
                 getLog().error("Errore durante la gestione del repository.", e);
             }

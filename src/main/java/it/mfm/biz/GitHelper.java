@@ -9,9 +9,9 @@ import it.mfm.util.JGitUtil;
 /**
  * Handler per l'interazione con i repository git
  */
-public class GitHandler {
+public class GitHelper {
 
-    public static final Logger logger = LogManager.getLogger(GitHandler.class);
+    public static final Logger logger = LogManager.getLogger(GitHelper.class);
 
     /**
      * Metodo per la gestione dei repository all'interno del build della app.

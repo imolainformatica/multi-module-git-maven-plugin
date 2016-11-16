@@ -17,31 +17,29 @@
 
     </dependencies>
     <build>
-            <plugins>
-                <plugin>
-                    <groupId>it.mfm</groupId>
-                    <artifactId>multi-module-git-maven-plugin</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                    <configuration>
-                        <basedir>target/test-classese/unit/multi-module-git-mojo</basedir>
-                        <repodir>target/test-classese/unit/multi-module-git-mojo/repositories</repodir>
-                        <widgets>
-                            <widget>
-                                <name>Widget1</name>
-                                <repository>http://repo1.git</repository>
-                                <version>1.0</version>
-                                <localDir>Widget1</localDir>
-                            </widget>
-                            <widget>
-                                <name>Widget2</name>
-                                <repository>http://repo2.git</repository>
-                                <version>2.0</version>
-                                <localDir>Widget2</localDir>
-                            </widget>
-                        </widgets>
-                    </configuration>
-                </plugin>
-            </plugins>
+        <plugins>
+            <plugin>
+                <artifactId>multi-module-git-maven-plugin</artifactId>
+                <configuration>
+                    <basedir>target/tests/unit/multi-module-git</basedir>
+                    <repodir>target/tests/unit/multi-module-git/repositories</repodir>
+                    <widgets>
+                        <widget>
+                            <name>Widget1</name>
+                            <repository>http://repo1.git</repository>
+                            <version>1.0</version>
+                            <localDir>Widget1</localDir>
+                        </widget>
+                        <widget>
+                            <name>Widget2</name>
+                            <repository>http://repo2.git</repository>
+                            <version>2.0</version>
+                            <localDir>Widget2</localDir>
+                        </widget>
+                    </widgets>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

@@ -1,34 +1,38 @@
 package it.mfm;
 
 import java.io.File;
+import java.net.URL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.plugin.testing.MojoRule;
+import org.apache.maven.plugin.testing.resources.TestResources;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class MultiModuleGitMojoTest extends AbstractMojoTestCase {
+public class MultiModuleGitMojoTest {
 
+    /**
+     * Logger di classe
+     */
     public static final Logger logger = LogManager.getLogger(MultiModuleGitMojoTest.class);
 
-    protected void setUp() throws Exception {
-        // required for mojo lookups to work
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-        // required
-        super.tearDown();
-    }
-
+    @Rule
+    public MojoRule rule = new MojoRule();
+    
+    @Test
     public void testSimpleBuild() throws Exception {
 
         logger.debug("INIZIO TEST - testSimpleBuild");
-
-        File pom = getTestFile("src/test/resources/unit/multi-module-git-mojo/pom.xml");
-        assertNotNull(pom);
-        assertTrue(pom.exists());
-        MultiModuleGitMojo mojo = (MultiModuleGitMojo) lookupMojo("multi-module-git", pom);
-        assertNotNull(mojo);
+        
+        URL url = Thread.currentThread().getContextClassLoader().getResource("unit/multi-module-git/pom.xml");
+        File pom = new File(url.getPath());
+        Assert.assertNotNull(pom);
+        Assert.assertTrue(pom.exists());
+        MultiModuleGitMojo mojo = (MultiModuleGitMojo) this.rule.lookupMojo("multi-module-git", pom);
+        Assert.assertNotNull(mojo);
         mojo.execute();
 
         logger.debug("FINE TEST - testSimpleBuild");

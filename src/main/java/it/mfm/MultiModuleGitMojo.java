@@ -148,7 +148,7 @@ public class MultiModuleGitMojo extends AbstractMojo {
         }
         
         File file = new File(basedir);
-        if(FileSystemUtil.isFileADirectory(file)){
+        if(!FileSystemUtil.isFileADirectory(file)){
             throw new Exception("Errore di inizializzazione: il campo basedir non punta ad una directory corretta");
         }
     }

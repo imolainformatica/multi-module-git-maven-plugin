@@ -13,6 +13,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.jgit.util.StringUtils;
 
 import it.mfm.biz.BuildHelper;
@@ -26,14 +27,15 @@ public class MultiModuleGitMojo extends AbstractMojo {
     /**
      * Questi 3 component servono per il mojo executor plugin
      */
-    @Component
-    private MavenProject mavenProject;
-
-    @Component
-    private MavenSession mavenSession;
-
-    @Component
-    private BuildPluginManager pluginManager;
+    @Parameter(defaultValue = "${project}", required = true, readonly = true) 
+    private MavenProject project; 
+ 
+    @Parameter(defaultValue = "${session}", required = true, readonly = true) 
+    private MavenSession session; 
+ 
+    @Component 
+    @Requirement 
+    private BuildPluginManager pluginManager; 
 
     /**
      * La root dell'applicazione invocante. Serve per calcolare i path relativi
@@ -100,6 +102,7 @@ public class MultiModuleGitMojo extends AbstractMojo {
         } catch (Exception e) {
             // Errore parametri di configurazione
             getLog().error("Errore nella verifica dei parametri di input.\n" + e.getMessage() + "\n", e);
+            return;
         }
 
         /*
@@ -118,15 +121,16 @@ public class MultiModuleGitMojo extends AbstractMojo {
                 gitHelper.handleRepository(widget, repodir);
             } catch (Exception e) {
                 getLog().error("Errore durante la gestione del repository.", e);
+                return;
             }
             
             // Copia dei file
-            buildHelper.copyResources(mavenProject, mavenSession, pluginManager, widget, repodir, basedir);
+            buildHelper.copyResources(project, session, pluginManager, widget, repodir, basedir);
         }
 
         // PARTE APP
         // Build della app
-        buildHelper.buildApp(mavenProject, mavenSession, pluginManager);
+        buildHelper.buildApp(project, session, pluginManager);
         
     }
     

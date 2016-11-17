@@ -15,16 +15,16 @@
                     <repodir>./src/test/resources/unit/multi-module-git/repositories</repodir>
                     <widgets>
                         <widget>
-                            <name>Widget1</name>
-                            <repository>http://repo1.git</repository>
-                            <version>1.0</version>
-                            <localDir>Widget1</localDir>
+                            <name>WidgetEarth</name>
+                            <repository>https://icompagnoni@bitbucket.org/imolainfomatica/widgetearth.git</repository>
+                            <version>master</version>
+                            <localDir>widgetearth</localDir>
                         </widget>
                         <widget>
-                            <name>Widget2</name>
-                            <repository>http://repo2.git</repository>
-                            <version>2.0</version>
-                            <localDir>Widget2</localDir>
+                            <name>WidgetMoon</name>
+                            <repository>https://icompagnoni@bitbucket.org/imolainfomatica/widgetmoon.git</repository>
+                            <version>master</version>
+                            <localDir>widgetmoon</localDir>
                         </widget>
                     </widgets>
                 </configuration>

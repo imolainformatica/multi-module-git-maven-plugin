@@ -1,7 +1,14 @@
 package it.mfm.biz;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
 
 import it.mfm.model.Widget;
 import it.mfm.util.JGitUtil;
@@ -27,7 +34,7 @@ public class GitHelper {
      *            progetto
      * @throws Exception
      */
-    public void handleRepository(Widget widget, String repodir) throws Exception {
+    public void handleRepository(Widget widget, String repodir) {
 
         if (widget != null) {
 
@@ -37,26 +44,19 @@ public class GitHelper {
 
             logger.debug("widgetLocalNameRepository=[" + widgetLocalNameRepository + "];localPathRepository=["
                     + localPathRepository + "];widgetVersion=[" + widgetVersion + "]");
-
-            if (!JGitUtil.checkRepositoryExists(localPathRepository)) {
-                // Il repository non esiste - clone
-                logger.debug("Clone del repository.");
-                try {
-                    String widgetRemoteRepository = widget.getRepository();
-                    logger.debug("widgetRemoteRepository=[" + widgetRemoteRepository + "]");
-                    JGitUtil.cloneRepositoryToPath(widgetRemoteRepository, widgetVersion, repodir);
-                } catch (Exception e) {
-                    throw new Exception("Errore in fase di clone del repository.", e);
-                }
-            } else {
-                // Il repository esiste - checkout
-                logger.debug("Checkout del repository.");
-                try {
-                    JGitUtil.checkoutRepository(localPathRepository, widgetVersion);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    throw new Exception("Errore in fase di pull del repository.", e);
-                }
+            
+            try {
+                JGitUtil.checkoutRepo(widget.getRepository(), widget.getVersion(), localPathRepository);
+            } catch (RefNotFoundException e) {
+                logger.error("Versione non trovata. [branch="+widget.getVersion()+"]", e);
+            } catch (InvalidRefNameException e) {
+                logger.error("Nome versione non valido. [branch="+widget.getVersion()+"].", e);
+            } catch (GitAPIException e) {
+                logger.error("Eccezione API Git:", e);
+            } catch (URISyntaxException e) {
+                logger.error("Uri sintatticamente non corretta.", e);
+            } catch (IOException e) {
+                logger.error("Errore di I/O.", e);
             }
 
         }

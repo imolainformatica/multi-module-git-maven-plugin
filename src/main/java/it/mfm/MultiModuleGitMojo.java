@@ -23,48 +23,59 @@ import it.mfm.util.FileSystemUtil;
 
 @Mojo(name = "multi-module-git", defaultPhase = LifecyclePhase.PACKAGE, requiresOnline = true, threadSafe = false)
 public class MultiModuleGitMojo extends AbstractMojo {
-    
-    /**
+
+    /******************************************************************************
      * Questi 3 component servono per il mojo executor plugin
-     */
-    @Parameter(defaultValue = "${project}", required = true, readonly = true) 
-    private MavenProject project; 
- 
-    @Parameter(defaultValue = "${session}", required = true, readonly = true) 
-    private MavenSession session; 
- 
-    @Component 
-    @Requirement 
-    private BuildPluginManager pluginManager; 
+     ******************************************************************************/
+    
+    @Parameter( property ="project", defaultValue = "${project}", readonly = true, required = true )
+    private MavenProject mavenProject;
 
     /**
+     * The current Maven session.
+     *
+     * @parameter expression="${session}"
+     * @required
+     * @readonly
+     */
+    private MavenSession mavenSession;
+
+    /**
+     * The Maven BuildPluginManager component.
+     *
+     * @component
+     * @required
+     */
+    private BuildPluginManager pluginManager;
+
+    /******************************************************************************
      * La root dell'applicazione invocante. Serve per calcolare i path relativi
      * alle risorse
-     */
+     ******************************************************************************/
     @Parameter(property = "multi-module-git.basedir", required = true)
     private String basedir;
 
-    /**
+    /******************************************************************************
      * La directory dove clonare e controllare i repository
-     */
+     ******************************************************************************/
     @Parameter(property = "multi-module-git.repodir")
     private String repodir;
 
-    /**
+    /******************************************************************************
      * La lista dei vari componenti da inseire nell'app
-     */
+     ******************************************************************************/
     @Parameter(property = "multi-module-git.widgets")
     private List<Widget> widgets;
 
-    /**
+    /******************************************************************************
      * Gestori delle logiche del plugin
-     */
+     ******************************************************************************/
     GitHelper gitHelper = new GitHelper();
     BuildHelper buildHelper = new BuildHelper();
 
-    /**************************************
+    /*****************************************************************************
      * getter & setter
-     **************************************/
+     *****************************************************************************/
     public String getBasedir() {
         return basedir;
     }
@@ -89,9 +100,9 @@ public class MultiModuleGitMojo extends AbstractMojo {
         this.widgets = widgets;
     }
 
-    /**
+    /******************************************************************************
      * Esecuzione del plugin
-     */
+     ******************************************************************************/
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         /*
@@ -115,7 +126,7 @@ public class MultiModuleGitMojo extends AbstractMojo {
                 // quella corrente
                 repodir = "./repository";
             }
-            
+
             // Gestione repository git
             try {
                 gitHelper.handleRepository(widget, repodir);
@@ -123,32 +134,33 @@ public class MultiModuleGitMojo extends AbstractMojo {
                 getLog().error("Errore durante la gestione del repository.", e);
                 return;
             }
-            
+
             // Copia dei file
-            buildHelper.copyResources(project, session, pluginManager, widget, repodir, basedir);
+            buildHelper.copyResources(mavenProject, mavenSession, pluginManager, widget, repodir, basedir);
         }
 
         // PARTE APP
         // Build della app
-        buildHelper.buildApp(project, session, pluginManager);
-        
+        buildHelper.buildApp(mavenProject, mavenSession, pluginManager);
+
     }
-    
-    
-    /**
+
+    /******************************************************************************
      * Metodo di utilità per il controllo dei parametri di input del plugin.
-     * Restituisce un eccezione in caso il parametro {@code basedir} non sia presente o non punti ad una directory
+     * Restituisce un eccezione in caso il parametro {@code basedir} non sia
+     * presente o non punti ad una directory
+     * 
      * @throws Exception
-     */
+     ******************************************************************************/
     private void checkInputParams() throws Exception {
-                
+
         String basedir = this.getBasedir();
-        if(StringUtils.isEmptyOrNull(basedir)){
+        if (StringUtils.isEmptyOrNull(basedir)) {
             throw new Exception("Errore di inizializzazione: il campo basedir è obbligatorio");
         }
-        
+
         File file = new File(basedir);
-        if(!FileSystemUtil.isFileADirectory(file)){
+        if (!FileSystemUtil.isFileADirectory(file)) {
             throw new Exception("Errore di inizializzazione: il campo basedir non punta ad una directory corretta");
         }
     }

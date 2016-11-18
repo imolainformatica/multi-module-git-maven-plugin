@@ -1,0 +1,16 @@
+$primaryColor: #f7fcac;
+
+// Questo viene sovrascritto perché è definito in main.scss
+// e nel css finale arriva dopo
+body {
+    background: $primaryColor;
+}
+
+.moon-div {
+    background: $primaryColor;
+}
+
+.moon-div-right {
+    @extend .moon-div;
+    float: right;
+}

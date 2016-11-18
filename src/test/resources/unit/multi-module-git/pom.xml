@@ -11,7 +11,7 @@
             <plugin>
                 <artifactId>multi-module-git-maven-plugin</artifactId>
                 <configuration>
-                    <basedir>./src/test/resources/unit/multi-module-git</basedir>
+                    <basedir>./src/test/resources/unit/multi-module-git/fake-app</basedir>
                     <repodir>./src/test/resources/unit/multi-module-git/repositories</repodir>
                     <widgets>
                         <widget>

@@ -1,0 +1,11 @@
+$primaryColor: #a2ea12;
+
+// Questo viene sovrascritto perché è definito in main.scss
+// e nel css finale arriva dopo
+body {
+    background: $primaryColor;
+}
+
+earth-div {
+    background: $primaryColor;
+}

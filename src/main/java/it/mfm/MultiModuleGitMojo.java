@@ -1,19 +1,15 @@
 package it.mfm;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.jgit.util.StringUtils;
 
 import it.mfm.biz.BuildHelper;
@@ -23,30 +19,6 @@ import it.mfm.util.FileSystemUtil;
 
 @Mojo(name = "multi-module-git", defaultPhase = LifecyclePhase.PACKAGE, requiresOnline = true, threadSafe = false)
 public class MultiModuleGitMojo extends AbstractMojo {
-
-    /******************************************************************************
-     * Questi 3 component servono per il mojo executor plugin
-     ******************************************************************************/
-    
-    @Parameter( property ="project", defaultValue = "${project}", readonly = true, required = true )
-    private MavenProject mavenProject;
-
-    /**
-     * The current Maven session.
-     *
-     * @parameter expression="${session}"
-     * @required
-     * @readonly
-     */
-    private MavenSession mavenSession;
-
-    /**
-     * The Maven BuildPluginManager component.
-     *
-     * @component
-     * @required
-     */
-    private BuildPluginManager pluginManager;
 
     /******************************************************************************
      * La root dell'applicazione invocante. Serve per calcolare i path relativi
@@ -134,14 +106,19 @@ public class MultiModuleGitMojo extends AbstractMojo {
                 getLog().error("Errore durante la gestione del repository.", e);
                 return;
             }
-
+            
             // Copia dei file
-            buildHelper.copyResources(mavenProject, mavenSession, pluginManager, widget, repodir, basedir);
+            try {
+                buildHelper.copyResources( widget, repodir, basedir);
+            } catch (IOException e) {
+                getLog().error("Errore durante la copia delle risorse: " + e.getMessage()+" .", e);
+                e.printStackTrace();
+            }
         }
 
         // PARTE APP
         // Build della app
-        buildHelper.buildApp(mavenProject, mavenSession, pluginManager);
+        //buildHelper.buildApp(basedir);
 
     }
 
